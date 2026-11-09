@@ -147,3 +147,10 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+# --- AI First Events ---
+next-env.d.ts
+playwright-report/
+test-results/
+.playwright-mcp/
+.DS_Store

@@ -1,0 +1,34 @@
+{
+  "name": "aifirst-events",
+  "private": true,
+  "packageManager": "pnpm@9.15.9",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --filter @aifirst/api --filter @aifirst/web dev",
+    "build": "pnpm -r build",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "pnpm -r typecheck",
+    "test:unit": "pnpm --filter @aifirst/api test:unit",
+    "test:integration": "pnpm --filter @aifirst/api test:integration",
+    "test:e2e": "pnpm --filter @aifirst/e2e test",
+    "db:generate": "pnpm --filter @aifirst/db generate",
+    "db:migrate": "pnpm --filter @aifirst/db migrate",
+    "db:seed": "pnpm --filter @aifirst/db seed",
+    "db:reset": "pnpm --filter @aifirst/db reset"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.39.5",
+    "@next/eslint-plugin-next": "16.4.5",
+    "@types/node": "22.20.5",
+    "eslint": "9.39.5",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "globals": "16.5.0",
+    "prettier": "3.9.10",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.72.1"
+  }
+}
