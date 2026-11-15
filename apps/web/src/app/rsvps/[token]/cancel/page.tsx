@@ -41,7 +41,7 @@ export default async function CancelRsvpPage({ params }: { params: Promise<{ tok
         <p className="text-slate-700">{formatTimeRange(event.startsAt, event.endsAt)}</p>
         <p className="text-slate-700">{event.location}</p>
       </div>
-      <CancelRsvpForm token={token} eventId={event.id} isPast={event.isPast} />
+      <CancelRsvpForm token={token} isPast={event.isPast} />
     </div>
   );
 }

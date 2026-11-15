@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useActionState } from 'react';
 import { cancelRsvpAction, type CancelRsvpState } from '@/app/rsvps/[token]/cancel/actions';
 
@@ -8,28 +7,14 @@ const initialState: CancelRsvpState = { status: 'idle' };
 
 interface Props {
   token: string;
-  eventId: number;
   isPast: boolean;
 }
 
-export function CancelRsvpForm({ token, eventId, isPast }: Props) {
+export function CancelRsvpForm({ token, isPast }: Props) {
   const [state, formAction, pending] = useActionState(
     cancelRsvpAction.bind(null, token),
     initialState,
   );
-
-  if (state.status === 'success') {
-    return (
-      <div className="space-y-3">
-        <p role="status" className="rounded bg-emerald-50 p-4 text-emerald-800">
-          {state.message}
-        </p>
-        <Link href={`/events/${eventId}`} className="text-indigo-700 hover:underline">
-          Back to the event
-        </Link>
-      </div>
-    );
-  }
 
   if (isPast) {
     return (
