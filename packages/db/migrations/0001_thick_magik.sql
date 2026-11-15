@@ -1,0 +1,2 @@
+ALTER TABLE "attendees" ADD COLUMN "cancel_token" uuid DEFAULT gen_random_uuid() NOT NULL;--> statement-breakpoint
+ALTER TABLE "attendees" ADD CONSTRAINT "attendees_cancel_token_unique" UNIQUE("cancel_token");

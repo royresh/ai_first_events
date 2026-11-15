@@ -4,6 +4,8 @@ export const ApiErrorCode = {
   EVENT_FULL: 'EVENT_FULL',
   DUPLICATE_EMAIL: 'DUPLICATE_EMAIL',
   EVENT_PAST: 'EVENT_PAST',
+  CANCEL_CLOSED: 'CANCEL_CLOSED',
+  RSVP_NOT_FOUND: 'RSVP_NOT_FOUND',
   NOT_FOUND: 'NOT_FOUND',
   VALIDATION: 'VALIDATION',
 } as const;
@@ -14,6 +16,8 @@ export const apiErrorStatus: Record<ApiErrorCode, number> = {
   EVENT_FULL: 409,
   DUPLICATE_EMAIL: 409,
   EVENT_PAST: 409,
+  CANCEL_CLOSED: 409,
+  RSVP_NOT_FOUND: 404,
   NOT_FOUND: 404,
   VALIDATION: 400,
 };
@@ -23,6 +27,8 @@ export const apiErrorMessage: Record<ApiErrorCode, string> = {
   EVENT_FULL: 'Sorry, this event is full.',
   DUPLICATE_EMAIL: 'This email is already registered for this event.',
   EVENT_PAST: 'This event has already happened, so RSVPs are closed.',
+  CANCEL_CLOSED: 'This event has already started, so the RSVP can no longer be cancelled.',
+  RSVP_NOT_FOUND: 'This cancel link is invalid, or the RSVP was already cancelled.',
   NOT_FOUND: 'Event not found.',
   VALIDATION: 'Please fix the highlighted fields.',
 };

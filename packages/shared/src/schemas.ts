@@ -59,6 +59,24 @@ export const AdminEventRowSchema = z.object({
 });
 export type AdminEventRow = z.infer<typeof AdminEventRowSchema>;
 
+/** The secret token from the "cancel my RSVP" email link. */
+export const RsvpTokenParamSchema = z.object({
+  token: z.uuid(),
+});
+
+/** What the cancel page shows before the attendee confirms (no email address). */
+export const RsvpLookupSchema = z.object({
+  attendee: z.object({ name: z.string() }),
+  event: EventSummarySchema,
+});
+export type RsvpLookup = z.infer<typeof RsvpLookupSchema>;
+
+export const CancelRsvpResultSchema = z.object({
+  eventId: z.number().int(),
+  goingCount: z.number().int().nonnegative(),
+});
+export type CancelRsvpResult = z.infer<typeof CancelRsvpResultSchema>;
+
 export const EventIdParamSchema = z.object({
   id: z.coerce.number().int().positive(),
 });

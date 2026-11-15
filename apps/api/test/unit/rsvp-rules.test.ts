@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { checkRsvp, isFull, isPast, normalizeEmail } from '../../src/domain/rsvp-rules';
+import {
+  checkCancel,
+  checkRsvp,
+  isFull,
+  isPast,
+  normalizeEmail,
+} from '../../src/domain/rsvp-rules';
 
 const now = new Date('2026-06-01T12:00:00Z');
 const tomorrow = new Date('2026-06-02T12:00:00Z');
@@ -90,5 +96,16 @@ describe('past events', () => {
       now,
     });
     expect(decision).toEqual({ ok: false, code: 'EVENT_PAST' });
+  });
+});
+
+describe('checkCancel', () => {
+  it('allows cancelling before the event starts', () => {
+    expect(checkCancel({ startsAt: tomorrow, now })).toEqual({ ok: true });
+  });
+
+  it('rejects with CANCEL_CLOSED once the event has started', () => {
+    expect(checkCancel({ startsAt: yesterday, now })).toEqual({ ok: false, code: 'CANCEL_CLOSED' });
+    expect(checkCancel({ startsAt: now, now })).toEqual({ ok: false, code: 'CANCEL_CLOSED' });
   });
 });

@@ -41,6 +41,7 @@ services:
       SMTP_HOST: mailpit
       SMTP_PORT: '1025'
       MAIL_FROM: AI First Events <events@aifirst.local>
+      WEB_URL: http://localhost:3000
     ports:
       - '4000:4000'
     depends_on:
