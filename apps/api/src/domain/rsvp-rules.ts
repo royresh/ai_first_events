@@ -45,3 +45,12 @@ export function checkRsvp({ event, existingEmails, email, now }: RsvpRuleInput):
 
   return { ok: true };
 }
+
+export type CancelDecision =
+  { ok: true } | { ok: false; code: Extract<ApiErrorCode, 'CANCEL_CLOSED'> };
+
+/** An RSVP can be cancelled any time before the event starts. */
+export function checkCancel({ startsAt, now }: { startsAt: Date; now: Date }): CancelDecision {
+  if (isPast(startsAt, now)) return { ok: false, code: 'CANCEL_CLOSED' };
+  return { ok: true };
+}

@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm';
-import { index, integer, pgTable, text, timestamp, uniqueIndex } from 'drizzle-orm/pg-core';
+import { index, integer, pgTable, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
 
 export const events = pgTable('events', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
@@ -21,6 +21,8 @@ export const attendees = pgTable(
       .references(() => events.id, { onDelete: 'cascade' }),
     name: text('name').notNull(),
     email: text('email').notNull(),
+    /** Secret for the "cancel my RSVP" link in the confirmation email. Never expose publicly. */
+    cancelToken: uuid('cancel_token').notNull().defaultRandom().unique(),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [

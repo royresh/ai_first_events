@@ -30,6 +30,7 @@ export function useTestApp() {
       host: SMTP_HOST,
       port: SMTP_PORT,
       from: 'AI First Events <events@aifirst.local>',
+      webUrl: 'http://localhost:3000',
     });
     ctx.db = handle.db;
     ctx.app = buildApp({ db: handle.db, mailer });

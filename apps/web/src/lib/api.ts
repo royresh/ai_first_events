@@ -5,14 +5,18 @@
 import {
   AdminEventRowSchema,
   ApiErrorBodySchema,
+  CancelRsvpResultSchema,
   EventDetailSchema,
   EventSummarySchema,
+  RsvpLookupSchema,
   RsvpResultSchema,
   type AdminEventRow,
   type ApiErrorBody,
+  type CancelRsvpResult,
   type EventDetail,
   type EventSummary,
   type RsvpInput,
+  type RsvpLookup,
   type RsvpResult,
 } from '@aifirst/shared';
 import type { z } from 'zod';
@@ -56,4 +60,27 @@ export async function postRsvp(eventId: number, input: RsvpInput): Promise<RsvpR
   const parsed = ApiErrorBodySchema.safeParse(body);
   if (parsed.success) return { ok: false, error: parsed.data.error };
   throw new Error(`POST /events/${eventId}/rsvps failed with ${res.status}`);
+}
+
+/** Returns null when the cancel link is invalid or the RSVP was already cancelled. */
+export async function getRsvpByToken(token: string): Promise<RsvpLookup | null> {
+  const res = await fetch(`${API_URL}/rsvps/${encodeURIComponent(token)}`, { cache: 'no-store' });
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`GET /rsvps/:token failed with ${res.status}`);
+  return RsvpLookupSchema.parse(await res.json());
+}
+
+export type CancelRsvpResponse =
+  { ok: true; data: CancelRsvpResult } | { ok: false; error: ApiErrorBody['error'] };
+
+export async function postCancelRsvp(token: string): Promise<CancelRsvpResponse> {
+  const res = await fetch(`${API_URL}/rsvps/${encodeURIComponent(token)}/cancel`, {
+    method: 'POST',
+    cache: 'no-store',
+  });
+  const body: unknown = await res.json();
+  if (res.ok) return { ok: true, data: CancelRsvpResultSchema.parse(body) };
+  const parsed = ApiErrorBodySchema.safeParse(body);
+  if (parsed.success) return { ok: false, error: parsed.data.error };
+  throw new Error(`POST /rsvps/:token/cancel failed with ${res.status}`);
 }

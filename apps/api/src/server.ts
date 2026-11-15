@@ -10,6 +10,7 @@ export async function startServer(): Promise<void> {
     host: config.SMTP_HOST,
     port: config.SMTP_PORT,
     from: config.MAIL_FROM,
+    webUrl: config.WEB_URL,
   });
   const app = buildApp({ db, mailer }, { logger: { level: config.LOG_LEVEL } });
 
