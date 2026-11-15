@@ -8,8 +8,15 @@ import { notFound } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
-export default async function EventPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function EventPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ cancelled?: string }>;
+}) {
   const { id } = await params;
+  const { cancelled } = await searchParams;
   const eventId = Number(id);
   if (!Number.isInteger(eventId) || eventId <= 0) notFound();
 
@@ -21,6 +28,12 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
       <Link href="/" className="text-sm text-slate-600 hover:text-slate-900">
         ← All events
       </Link>
+
+      {cancelled === '1' && (
+        <p role="status" className="rounded bg-emerald-50 p-4 text-emerald-800">
+          Your RSVP is cancelled and your seat has been released. We sent you a confirmation email.
+        </p>
+      )}
 
       <header className="space-y-2">
         <div className="flex flex-wrap items-center gap-2">
