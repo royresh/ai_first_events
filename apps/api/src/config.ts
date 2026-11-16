@@ -7,6 +7,8 @@ const ConfigSchema = z.object({
   SMTP_HOST: z.string().default('localhost'),
   SMTP_PORT: z.coerce.number().int().default(1025),
   MAIL_FROM: z.string().default('AI First Events <events@aifirst.local>'),
+  /** Public URL of the web app, for links back to event pages. */
+  WEB_URL: z.string().default('http://localhost:3000'),
   LOG_LEVEL: z.string().default('info'),
 });
 

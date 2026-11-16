@@ -1,7 +1,7 @@
 import { AttendeeList } from '@/components/AttendeeList';
 import { Badge } from '@/components/Badge';
 import { RsvpForm } from '@/components/RsvpForm';
-import { getEvent } from '@/lib/api';
+import { calendarUrl, getEvent } from '@/lib/api';
 import { formatTimeRange, spotsLeft } from '@/lib/format';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -33,6 +33,13 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
         </div>
         <p className="text-slate-700">{formatTimeRange(event.startsAt, event.endsAt)}</p>
         <p className="text-slate-700">{event.location}</p>
+        <a
+          href={calendarUrl(event.id)}
+          download
+          className="inline-block rounded border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-800 hover:bg-slate-50"
+        >
+          Add to calendar
+        </a>
       </header>
 
       <p className="whitespace-pre-line leading-relaxed">{event.description}</p>

@@ -11,7 +11,10 @@ export async function startServer(): Promise<void> {
     port: config.SMTP_PORT,
     from: config.MAIL_FROM,
   });
-  const app = buildApp({ db, mailer }, { logger: { level: config.LOG_LEVEL } });
+  const app = buildApp(
+    { db, mailer, webUrl: config.WEB_URL },
+    { logger: { level: config.LOG_LEVEL } },
+  );
 
   const shutdown = async () => {
     await app.close();

@@ -25,6 +25,11 @@ async function getJson<S extends z.ZodType>(path: string, schema: S): Promise<z.
   return schema.parse(await res.json());
 }
 
+/** Where the "Add to calendar" button downloads the event's .ics file from. */
+export function calendarUrl(eventId: number): string {
+  return `${API_URL}/events/${eventId}/calendar.ics`;
+}
+
 export function listEvents(): Promise<EventSummary[]> {
   return getJson('/events', EventSummarySchema.array());
 }

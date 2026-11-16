@@ -12,13 +12,15 @@ export interface AppDeps {
   mailer: Mailer;
   /** Injectable clock, handy in tests. */
   now: () => Date;
+  /** Public URL of the web app, for links back to event pages. */
+  webUrl: string;
 }
 
 export function buildApp(
-  deps: Omit<AppDeps, 'now'> & { now?: () => Date },
+  deps: Omit<AppDeps, 'now' | 'webUrl'> & { now?: () => Date; webUrl?: string },
   opts: FastifyServerOptions = {},
 ) {
-  const full: AppDeps = { now: () => new Date(), ...deps };
+  const full: AppDeps = { now: () => new Date(), webUrl: 'http://localhost:3000', ...deps };
   const app = Fastify(opts);
 
   app.setErrorHandler((err, req, reply) => {

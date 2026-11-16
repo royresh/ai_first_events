@@ -3,6 +3,7 @@ import { ApiError, EventIdParamSchema, type EventDetail, type EventSummary } fro
 import { asc, count, eq, getTableColumns, gt } from 'drizzle-orm';
 import type { FastifyPluginAsync } from 'fastify';
 import type { AppDeps } from '../app';
+import { buildIcs, icsFileName } from '../domain/ics';
 import { isFull, isPast } from '../domain/rsvp-rules';
 import { parseOrThrow } from '../validation';
 
@@ -21,7 +22,7 @@ export function toEventSummary(event: EventRow, goingCount: number, now: Date): 
 }
 
 export const eventRoutes =
-  ({ db, now }: AppDeps): FastifyPluginAsync =>
+  ({ db, now, webUrl }: AppDeps): FastifyPluginAsync =>
   async (app) => {
     /** Upcoming events, soonest first. */
     app.get('/events', async (): Promise<EventSummary[]> => {
@@ -53,5 +54,22 @@ export const eventRoutes =
         description: event.description,
         attendees: people.map((p) => ({ ...p, createdAt: p.createdAt.toISOString() })),
       };
+    });
+
+    /** The event as an iCalendar file, for "Add to calendar". */
+    app.get('/events/:id/calendar.ics', async (req, reply) => {
+      const { id } = parseOrThrow(EventIdParamSchema, req.params);
+      const event = await db.query.events.findFirst({ where: eq(events.id, id) });
+      if (!event) throw new ApiError('NOT_FOUND');
+
+      const fileName = icsFileName(event.title);
+      const asciiName = fileName.replace(/[^\x20-\x7e]/g, '_');
+      return reply
+        .header('content-type', 'text/calendar; charset=utf-8')
+        .header(
+          'content-disposition',
+          `attachment; filename="${asciiName}"; filename*=UTF-8''${encodeURIComponent(fileName)}`,
+        )
+        .send(buildIcs(event, { url: `${webUrl}/events/${event.id}`, now: now() }));
     });
   };
