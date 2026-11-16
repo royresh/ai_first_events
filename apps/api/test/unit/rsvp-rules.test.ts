@@ -55,6 +55,16 @@ describe('duplicate email', () => {
     expect(normalizeEmail(' A@B.Com ')).toBe('a@b.com');
   });
 
+  it('finds the duplicate among several existing attendees', () => {
+    const decision = checkRsvp({
+      event: { capacity: 10, startsAt: tomorrow },
+      existingEmails: ['a@x.com', 'dana@example.com', 'b@x.com'],
+      email: 'Dana@Example.com',
+      now,
+    });
+    expect(decision).toEqual({ ok: false, code: 'DUPLICATE_EMAIL' });
+  });
+
   it('reports DUPLICATE_EMAIL (not EVENT_FULL) when an existing attendee retries a full event', () => {
     const decision = checkRsvp({
       event: { capacity: 1, startsAt: tomorrow },
