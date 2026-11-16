@@ -13,6 +13,8 @@ export default tseslint.config(
       '**/dist/**',
       '**/playwright-report/**',
       '**/test-results/**',
+      '**/.stryker-tmp/**',
+      '**/reports/mutation/**',
       'packages/db/migrations/**',
       '**/next-env.d.ts',
     ],
