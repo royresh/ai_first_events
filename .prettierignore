@@ -4,3 +4,5 @@ packages/db/migrations
 **/dist
 **/playwright-report
 **/test-results
+**/.stryker-tmp
+**/reports/mutation

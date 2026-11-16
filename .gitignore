@@ -154,3 +154,7 @@ playwright-report/
 test-results/
 .playwright-mcp/
 .DS_Store
+
+# Stryker mutation testing
+**/.stryker-tmp/
+**/reports/mutation/

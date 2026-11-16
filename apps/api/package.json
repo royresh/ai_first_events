@@ -9,7 +9,8 @@
     "start:docker": "tsx src/docker-entrypoint.ts",
     "typecheck": "tsc -p tsconfig.json",
     "test:unit": "vitest run --config vitest.config.ts",
-    "test:integration": "vitest run --config vitest.integration.config.ts"
+    "test:integration": "vitest run --config vitest.integration.config.ts",
+    "test:mutation": "stryker run"
   },
   "dependencies": {
     "@aifirst/db": "workspace:*",
@@ -21,6 +22,8 @@
     "zod": "4.6.7"
   },
   "devDependencies": {
+    "@stryker-mutator/core": "10.1.1",
+    "@stryker-mutator/vitest-runner": "10.1.1",
     "@types/nodemailer": "7.0.12",
     "vitest": "3.2.7"
   }
