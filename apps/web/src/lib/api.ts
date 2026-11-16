@@ -25,9 +25,22 @@ async function getJson<S extends z.ZodType>(path: string, schema: S): Promise<z.
   return schema.parse(await res.json());
 }
 
-/** Where the "Add to calendar" button downloads the event's .ics file from. */
-export function calendarUrl(eventId: number): string {
-  return `${API_URL}/events/${eventId}/calendar.ics`;
+export interface CalendarFile {
+  body: string;
+  contentType: string;
+  contentDisposition: string;
+}
+
+/** The event's .ics file from the API, or null when the event does not exist. */
+export async function getCalendarFile(eventId: number): Promise<CalendarFile | null> {
+  const res = await fetch(`${API_URL}/events/${eventId}/calendar.ics`, { cache: 'no-store' });
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`GET /events/${eventId}/calendar.ics failed with ${res.status}`);
+  return {
+    body: await res.text(),
+    contentType: res.headers.get('content-type') ?? 'text/calendar; charset=utf-8',
+    contentDisposition: res.headers.get('content-disposition') ?? 'attachment',
+  };
 }
 
 export function listEvents(): Promise<EventSummary[]> {
