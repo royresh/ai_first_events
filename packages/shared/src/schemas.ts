@@ -59,6 +59,13 @@ export const AdminEventRowSchema = z.object({
 });
 export type AdminEventRow = z.infer<typeof AdminEventRowSchema>;
 
+/** Query string for GET /events. */
+export const EventsQuerySchema = z.object({
+  /** Case-insensitive search on the event title. */
+  q: z.string().trim().optional(),
+});
+export type EventsQuery = z.infer<typeof EventsQuerySchema>;
+
 export const EventIdParamSchema = z.object({
   id: z.coerce.number().int().positive(),
 });
