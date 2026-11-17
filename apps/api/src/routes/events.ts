@@ -6,7 +6,7 @@ import {
   type EventDetail,
   type EventSummary,
 } from '@aifirst/shared';
-import { and, asc, count, eq, getTableColumns, gt, sql } from 'drizzle-orm';
+import { and, asc, count, eq, getTableColumns, gt, ilike } from 'drizzle-orm';
 import type { FastifyPluginAsync } from 'fastify';
 import type { AppDeps } from '../app';
 import { isFull, isPast } from '../domain/rsvp-rules';
@@ -33,7 +33,8 @@ export const eventRoutes =
     app.get('/events', async (req): Promise<EventSummary[]> => {
       const { q } = parseOrThrow(EventsQuerySchema, req.query);
       const current = now();
-      const titleMatches = q ? sql.raw(`events.title ILIKE '%${q}%'`) : undefined;
+      // Bound as a parameter, never pasted into the SQL text.
+      const titleMatches = q ? ilike(events.title, `%${q}%`) : undefined;
       const rows = await db
         .select({ ...getTableColumns(events), goingCount: count(attendees.id) })
         .from(events)
