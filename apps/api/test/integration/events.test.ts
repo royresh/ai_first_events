@@ -74,6 +74,28 @@ describe('GET /events?q=', () => {
     expect(events.map((e) => e.title)).toEqual(['RAG Deep Dive']);
   });
 
+  it('treats a quote in the search as plain text, not SQL', async () => {
+    const res = await ctx.app.inject({
+      method: 'GET',
+      url: `/events?q=${encodeURIComponent("'")}`,
+    });
+    expect(res.statusCode).toBe(200);
+    expect(res.json()).toEqual([]);
+  });
+
+  it('cannot be used to read attendee data (SQL injection)', async () => {
+    const payload =
+      "zzz%') GROUP BY events.id UNION SELECT a.id, a.email, a.name, a.name, " +
+      "now() + interval '1 day', now() + interval '2 days', 1, now(), 0 FROM attendees a --";
+    const res = await ctx.app.inject({
+      method: 'GET',
+      url: `/events?q=${encodeURIComponent(payload)}`,
+    });
+    expect(res.statusCode).toBe(200);
+    expect(res.json()).toEqual([]);
+    expect(res.body).not.toContain('@example.com');
+  });
+
   it('returns an empty list when nothing matches', async () => {
     const res = await ctx.app.inject({ method: 'GET', url: '/events?q=nothing-like-this' });
     expect(res.json()).toEqual([]);
