@@ -65,3 +65,17 @@ describe('GET /events/:id', () => {
     expect(res.json().error.code).toBe('VALIDATION');
   });
 });
+
+describe('GET /events?q=', () => {
+  it('filters upcoming events by title, case-insensitively', async () => {
+    const res = await ctx.app.inject({ method: 'GET', url: '/events?q=rag' });
+    expect(res.statusCode).toBe(200);
+    const events = EventSummarySchema.array().parse(res.json());
+    expect(events.map((e) => e.title)).toEqual(['RAG Deep Dive']);
+  });
+
+  it('returns an empty list when nothing matches', async () => {
+    const res = await ctx.app.inject({ method: 'GET', url: '/events?q=nothing-like-this' });
+    expect(res.json()).toEqual([]);
+  });
+});

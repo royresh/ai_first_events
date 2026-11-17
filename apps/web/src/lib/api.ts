@@ -25,8 +25,9 @@ async function getJson<S extends z.ZodType>(path: string, schema: S): Promise<z.
   return schema.parse(await res.json());
 }
 
-export function listEvents(): Promise<EventSummary[]> {
-  return getJson('/events', EventSummarySchema.array());
+export function listEvents(q?: string): Promise<EventSummary[]> {
+  const query = q ? `?q=${encodeURIComponent(q)}` : '';
+  return getJson(`/events${query}`, EventSummarySchema.array());
 }
 
 /** Returns null when the event does not exist. */

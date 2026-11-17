@@ -1,6 +1,12 @@
 import { attendees, events, type EventRow } from '@aifirst/db';
-import { ApiError, EventIdParamSchema, type EventDetail, type EventSummary } from '@aifirst/shared';
-import { asc, count, eq, getTableColumns, gt } from 'drizzle-orm';
+import {
+  ApiError,
+  EventIdParamSchema,
+  EventsQuerySchema,
+  type EventDetail,
+  type EventSummary,
+} from '@aifirst/shared';
+import { and, asc, count, eq, getTableColumns, gt, sql } from 'drizzle-orm';
 import type { FastifyPluginAsync } from 'fastify';
 import type { AppDeps } from '../app';
 import { isFull, isPast } from '../domain/rsvp-rules';
@@ -23,14 +29,16 @@ export function toEventSummary(event: EventRow, goingCount: number, now: Date): 
 export const eventRoutes =
   ({ db, now }: AppDeps): FastifyPluginAsync =>
   async (app) => {
-    /** Upcoming events, soonest first. */
-    app.get('/events', async (): Promise<EventSummary[]> => {
+    /** Upcoming events, soonest first. `?q=` filters by title, case-insensitively. */
+    app.get('/events', async (req): Promise<EventSummary[]> => {
+      const { q } = parseOrThrow(EventsQuerySchema, req.query);
       const current = now();
+      const titleMatches = q ? sql.raw(`events.title ILIKE '%${q}%'`) : undefined;
       const rows = await db
         .select({ ...getTableColumns(events), goingCount: count(attendees.id) })
         .from(events)
         .leftJoin(attendees, eq(attendees.eventId, events.id))
-        .where(gt(events.startsAt, current))
+        .where(and(gt(events.startsAt, current), titleMatches))
         .groupBy(events.id)
         .orderBy(asc(events.startsAt));
       return rows.map(({ goingCount, ...event }) => toEventSummary(event, goingCount, current));
