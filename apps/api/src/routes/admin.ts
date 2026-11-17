@@ -1,9 +1,15 @@
 import { attendees, events } from '@aifirst/db';
-import type { AdminEventRow } from '@aifirst/shared';
+import {
+  ApiError,
+  EventIdParamSchema,
+  type AdminAttendee,
+  type AdminEventRow,
+} from '@aifirst/shared';
 import { asc, count, eq } from 'drizzle-orm';
 import type { FastifyPluginAsync } from 'fastify';
 import type { AppDeps } from '../app';
 import { isFull, isPast } from '../domain/rsvp-rules';
+import { parseOrThrow } from '../validation';
 
 export const adminRoutes =
   ({ db, now }: AppDeps): FastifyPluginAsync =>
@@ -29,5 +35,23 @@ export const adminRoutes =
         isFull: isFull(r.capacity, r.goingCount),
         isPast: isPast(r.startsAt, current),
       }));
+    });
+
+    /** Attendees of one event with their emails, in RSVP order. */
+    app.get('/admin/events/:id/attendees', async (req): Promise<AdminAttendee[]> => {
+      const { id } = parseOrThrow(EventIdParamSchema, req.params);
+      const event = await db.query.events.findFirst({ where: eq(events.id, id) });
+      if (!event) throw new ApiError('NOT_FOUND');
+      const rows = await db
+        .select({
+          id: attendees.id,
+          name: attendees.name,
+          email: attendees.email,
+          createdAt: attendees.createdAt,
+        })
+        .from(attendees)
+        .where(eq(attendees.eventId, id))
+        .orderBy(asc(attendees.createdAt), asc(attendees.id));
+      return rows.map((r) => ({ ...r, createdAt: r.createdAt.toISOString() }));
     });
   };

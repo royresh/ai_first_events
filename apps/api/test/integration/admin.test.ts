@@ -1,4 +1,4 @@
-import { AdminEventRowSchema } from '@aifirst/shared';
+import { AdminAttendeeSchema, AdminEventRowSchema } from '@aifirst/shared';
 import { describe, expect, it } from 'vitest';
 import { SEED, uniqueEmail, useTestApp } from './helpers';
 
@@ -33,5 +33,26 @@ describe('GET /admin/events', () => {
       (await ctx.app.inject({ method: 'GET', url: '/admin/events' })).json(),
     );
     expect(rows.find((r) => r.id === SEED.shipping)?.goingCount).toBe(1);
+  });
+});
+
+describe('GET /admin/events/:id/attendees', () => {
+  it('lists attendees with their emails in RSVP order', async () => {
+    const res = await ctx.app.inject({
+      method: 'GET',
+      url: `/admin/events/${SEED.intro}/attendees`,
+    });
+    expect(res.statusCode).toBe(200);
+    const rows = AdminAttendeeSchema.array().parse(res.json());
+    expect(rows.map((r) => [r.name, r.email])).toEqual([
+      ['Dana Levi', 'dana@example.com'],
+      ['Omar Haddad', 'omar@example.com'],
+      ['Maya Cohen', 'maya@example.com'],
+    ]);
+  });
+
+  it('404s for an unknown event', async () => {
+    const res = await ctx.app.inject({ method: 'GET', url: '/admin/events/9999/attendees' });
+    expect(res.statusCode).toBe(404);
   });
 });

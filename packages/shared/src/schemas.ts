@@ -59,6 +59,15 @@ export const AdminEventRowSchema = z.object({
 });
 export type AdminEventRow = z.infer<typeof AdminEventRowSchema>;
 
+/** Attendee as organizers see it: includes the email. Admin routes only. */
+export const AdminAttendeeSchema = z.object({
+  id: z.number().int(),
+  name: z.string(),
+  email: z.string(),
+  createdAt: z.iso.datetime(),
+});
+export type AdminAttendee = z.infer<typeof AdminAttendeeSchema>;
+
 export const EventIdParamSchema = z.object({
   id: z.coerce.number().int().positive(),
 });
