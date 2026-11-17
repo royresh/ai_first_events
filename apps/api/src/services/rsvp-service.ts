@@ -18,8 +18,9 @@ export interface RsvpServiceDeps {
  *
  * Runs in a transaction, and the confirmation email is sent before it commits: if the
  * email can't be sent, the RSVP is rolled back, so nobody holds a seat they were never
- * told about. The event row is deliberately not locked (no SELECT ... FOR UPDATE), so a
- * slow mail server never blocks other people RSVPing to the same event.
+ * told about. The event row is locked (SELECT ... FOR UPDATE) until the transaction ends,
+ * so two concurrent RSVPs for the last seat can't both succeed. The trade-off: RSVPs to
+ * the same event wait for each other while an email is being sent.
  */
 export async function createRsvp(
   deps: RsvpServiceDeps,
@@ -29,7 +30,7 @@ export async function createRsvp(
   const now = deps.now?.() ?? new Date();
 
   const { attendee, goingCount } = await deps.db.transaction(async (tx) => {
-    const [event] = await tx.select().from(events).where(eq(events.id, eventId));
+    const [event] = await tx.select().from(events).where(eq(events.id, eventId)).for('update');
     if (!event) throw new ApiError('NOT_FOUND');
 
     const existing = await tx
