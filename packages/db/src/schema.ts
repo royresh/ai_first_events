@@ -1,5 +1,4 @@
-import { sql } from 'drizzle-orm';
-import { index, integer, pgTable, text, timestamp, uniqueIndex } from 'drizzle-orm/pg-core';
+import { index, integer, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 
 export const events = pgTable('events', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
@@ -24,8 +23,8 @@ export const attendees = pgTable(
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [
-    // One RSVP per email per event, case-insensitive.
-    uniqueIndex('attendees_event_id_lower_email_unique').on(t.eventId, sql`lower(${t.email})`),
+    // No unique index on (event_id, lower(email)) on this demo branch: the duplicate-email
+    // rule is enforced only by checkRsvp, so the mutation demo can show its bug in the UI.
     index('attendees_event_id_idx').on(t.eventId),
   ],
 );
