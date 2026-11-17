@@ -1,9 +1,10 @@
 'use client';
 
-import type { AdminAttendee } from '@aifirst/shared';
+// Public page: this list is sent to the browser, so it must only ever hold names.
+import type { Attendee } from '@aifirst/shared';
 import { useState } from 'react';
 
-export function AttendeeList({ attendees }: { attendees: AdminAttendee[] }) {
+export function AttendeeList({ attendees }: { attendees: Attendee[] }) {
   const [query, setQuery] = useState('');
 
   if (attendees.length === 0) {
@@ -11,9 +12,7 @@ export function AttendeeList({ attendees }: { attendees: AdminAttendee[] }) {
   }
 
   const q = query.trim().toLowerCase();
-  const shown = q
-    ? attendees.filter((a) => a.name.toLowerCase().includes(q) || a.email.toLowerCase().includes(q))
-    : attendees;
+  const shown = q ? attendees.filter((a) => a.name.toLowerCase().includes(q)) : attendees;
 
   return (
     <div className="space-y-2">
@@ -21,7 +20,7 @@ export function AttendeeList({ attendees }: { attendees: AdminAttendee[] }) {
         type="search"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        placeholder="Search attendees by name or email"
+        placeholder="Search attendees by name"
         aria-label="Search attendees"
         className="w-full rounded border border-slate-300 px-3 py-2"
       />
