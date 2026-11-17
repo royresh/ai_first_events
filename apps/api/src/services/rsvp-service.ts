@@ -4,8 +4,6 @@ import { eq } from 'drizzle-orm';
 import { checkRsvp } from '../domain/rsvp-rules';
 import type { Mailer } from './mailer';
 
-const PG_UNIQUE_VIOLATION = '23505';
-
 export interface RsvpServiceDeps {
   db: Db;
   mailer: Mailer;
@@ -44,18 +42,12 @@ export async function createRsvp(
     });
     if (!decision.ok) throw new ApiError(decision.code);
 
-    try {
-      const [attendee] = await tx
-        .insert(attendees)
-        .values({ eventId, name: input.name, email: input.email })
-        .returning();
-      if (!attendee) throw new Error('insert returned no row');
-      return { event, attendee, goingCount: existing.length + 1 };
-    } catch (err) {
-      // Backstop for the unique (event_id, lower(email)) index.
-      if (isUniqueViolation(err)) throw new ApiError('DUPLICATE_EMAIL');
-      throw err;
-    }
+    const [attendee] = await tx
+      .insert(attendees)
+      .values({ eventId, name: input.name, email: input.email })
+      .returning();
+    if (!attendee) throw new Error('insert returned no row');
+    return { event, attendee, goingCount: existing.length + 1 };
   });
 
   try {
@@ -72,12 +64,4 @@ export async function createRsvp(
     eventId,
     goingCount,
   };
-}
-
-function isUniqueViolation(err: unknown): boolean {
-  // drizzle wraps driver errors; the pg error may be the error itself or its cause.
-  for (let e: unknown = err; e && typeof e === 'object'; e = (e as { cause?: unknown }).cause) {
-    if ((e as { code?: unknown }).code === PG_UNIQUE_VIOLATION) return true;
-  }
-  return false;
 }

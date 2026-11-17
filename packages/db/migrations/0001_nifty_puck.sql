@@ -1,0 +1,1 @@
+DROP INDEX "attendees_event_id_lower_email_unique";
