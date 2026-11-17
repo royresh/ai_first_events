@@ -1,0 +1,7 @@
+{
+  "browser": {
+    "launchOptions": {
+      "slowMo": 1500
+    }
+  }
+}
