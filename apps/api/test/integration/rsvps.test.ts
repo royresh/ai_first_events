@@ -80,12 +80,12 @@ describe('POST /events/:id/rsvps', () => {
       ).toBe(201);
     }
     const attempts = await Promise.all(
-      Array.from({ length: 5 }, (_, i) =>
+      Array.from({ length: 20 }, (_, i) =>
         rsvp(SEED.promptLab, { name: `Racer ${i}`, email: uniqueEmail('race') }),
       ),
     );
     const codes = attempts.map((r) => r.statusCode).sort();
-    expect(codes).toEqual([201, 409, 409, 409, 409]);
+    expect(codes).toEqual([201, ...Array<number>(19).fill(409)]);
 
     const detail = EventDetailSchema.parse(
       (await ctx.app.inject({ method: 'GET', url: `/events/${SEED.promptLab}` })).json(),
