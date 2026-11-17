@@ -1,7 +1,7 @@
 import { AttendeeList } from '@/components/AttendeeList';
 import { Badge } from '@/components/Badge';
 import { RsvpForm } from '@/components/RsvpForm';
-import { getEvent, listEventAttendees } from '@/lib/api';
+import { getEvent } from '@/lib/api';
 import { formatTimeRange, spotsLeft } from '@/lib/format';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -15,8 +15,6 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
 
   const event = await getEvent(eventId);
   if (!event) notFound();
-  // Full attendee records so the list can be searched by name or email.
-  const attendees = await listEventAttendees(eventId);
 
   return (
     <article className="space-y-8">
@@ -50,7 +48,7 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
                 ` · ${spotsLeft(event.capacity, event.goingCount)} spots left`}
             </span>
           </h2>
-          <AttendeeList attendees={attendees} />
+          <AttendeeList attendees={event.attendees} />
         </div>
 
         <div className="rounded-lg border border-slate-200 bg-white p-5">
