@@ -3,11 +3,13 @@
  * the browser never talks to the API directly (no CORS needed).
  */
 import {
+  AdminAttendeeSchema,
   AdminEventRowSchema,
   ApiErrorBodySchema,
   EventDetailSchema,
   EventSummarySchema,
   RsvpResultSchema,
+  type AdminAttendee,
   type AdminEventRow,
   type ApiErrorBody,
   type EventDetail,
@@ -56,4 +58,8 @@ export async function postRsvp(eventId: number, input: RsvpInput): Promise<RsvpR
   const parsed = ApiErrorBodySchema.safeParse(body);
   if (parsed.success) return { ok: false, error: parsed.data.error };
   throw new Error(`POST /events/${eventId}/rsvps failed with ${res.status}`);
+}
+
+export function listEventAttendees(eventId: number): Promise<AdminAttendee[]> {
+  return getJson(`/admin/events/${eventId}/attendees`, AdminAttendeeSchema.array());
 }
